@@ -98,6 +98,7 @@ def getSuccedingStablePoint(dampIndex, devList):
     return dampIndex
 
 
+
 """
 Return list of tuples for sit to stand process
 """
