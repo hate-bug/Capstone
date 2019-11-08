@@ -14,7 +14,7 @@ def read(filename):
         for rows in csvfile:
             data = rows.split(',')
             del data[0: 4]  # delete first three columns
-            del data[-1]
+            del data[-1] #delete last invalid element
             rowData = list(map(int, data))
             matrix = np.zeros((3, 8))
             matrix[0][0] = rowData[3]
@@ -56,5 +56,6 @@ def ani(matrixList):
     plt.close()
     return
 
-
-ani(read('sensor.csv'))
+#sensor3 is bouncing
+#sensor4 is fast
+ani(read('sensor5.csv'))
