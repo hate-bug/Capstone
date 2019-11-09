@@ -3,31 +3,32 @@ import numpy as np
 import csv
 import math
 
+#File used to create a new csv file that contains all sit-to-stand process extracted from given dataset
+#Consistes of index, time, acute angle number and type.
+#In terms of type, for all sit-to-stand process use more than 3s, defined as slow or bouncing.
+#For any sit-to-stand process that has more than 1 bounce, defined as bouncing.
+
+
 """
 Generate a new CSV file to current location. Named: currentfilename_resulr.csv
 @:param: Current file name
 """
-
-
 def csvCreator(fileName):
     sumList = getSum(fileName)
     DerivativeList = derivative(sumList)
     plt.plot(sumList)
     dampList = getDamp(DerivativeList)
     processTuples = getSitToStandProcess(dampList, DerivativeList)
-    acuteAngleNum = []
-    for singleTuple in processTuples:
-        acuteAngleNum.append(get_acute_angle_count(singleTuple, fileName))
     outputFileName = str(fileName).split(".csv")[0]
     outputFileName = outputFileName + "_result" + ".csv"
     with open(outputFileName, 'w') as csvfile:
         filewriter = csv.writer(csvfile, delimiter=',',
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
         index = 0
-        filewriter.writerow(['index', 'time', 'Type'])
+        filewriter.writerow(['index', 'time', 'acute angle', 'Type'])
         for values in processTuples:
             if len(values) == 3:
-                filewriter.writerow([index, getTime(values), values[2]])
+                filewriter.writerow([index, getTime(values), get_acute_angle_count(values,fileName), values[2]])
             else:
                 filewriter.writerow([index, getTime(values)])
             index = index + 1
@@ -38,8 +39,6 @@ Function to the the sum of each row in the CSV file
 Input: Name of the csv file in the path
 Output: List of values represent the sum value of each row
 """
-
-
 def getSum(fileName):
     with open(fileName) as csvfile:
         next(csvfile)
@@ -62,8 +61,6 @@ def getSum(fileName):
 """
 Plot the graph and set all the y lines to visualize the data
 """
-
-
 def plotSum(fileName):
     sumList = getSum(fileName)
     DerivativeList = derivative(sumList)
@@ -86,8 +83,6 @@ Function to get the derivative list of input list
 Param: List of values
 Return: List of derivation of input list 
 """
-
-
 def derivative(sumList):
     result = []
     for x in range(0, len(sumList) - 1):
@@ -101,8 +96,6 @@ Function to retuen the damp of a dataset
 param: The derivative list 
 return: List of points represent the damp 
 """
-
-
 def getDamp(devList):  # Each spike means a sitdown
     dampPoints = []
     minValue = min(devList)
@@ -123,8 +116,6 @@ Find the end of damp
 @param: the location of damp, list that contains that damp 
 return: The index number of the list that is the start of the damp 
 """
-
-
 def getPrecedingStablePoint(dampIndex, devList):
     while dampIndex > 0 and abs(devList[dampIndex]) > 200:
         dampIndex = dampIndex - 1
@@ -138,8 +129,6 @@ Find the start of the damp
 @param: The location of damp, list that contains the damp 
 return: The index of the list that is the end of the damp 
 """
-
-
 def getSuccedingStablePoint(dampIndex, devList):
     while dampIndex < (len(devList) - 1) and abs(devList[dampIndex]) > 200:
         dampIndex = dampIndex + 1
@@ -151,8 +140,6 @@ def getSuccedingStablePoint(dampIndex, devList):
 """
 Return list of tuples for sit to stand process
 """
-
-
 def getSitToStandProcess(dampList, devList):
     SitToStandList = []
     for dampIndex in dampList:
@@ -189,8 +176,6 @@ def getSitToStandProcess(dampList, devList):
 """
 Caculate the number of acute abgle based on the tuple and the CSV filename
 """
-
-
 def get_acute_angle_count(segment, FileName):
     # find the start and end point of the sit-to-stand
     start = segment[0]
@@ -268,8 +253,6 @@ def get_acute_angle_count(segment, FileName):
 Calculate the time difference for each tuple
 The unit is millisecond 
 """
-
-
 def getTime(processTuple):
     if (processTuple[1] > processTuple[0]):
         return 100 * (processTuple[1] - processTuple[0])
